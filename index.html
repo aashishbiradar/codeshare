@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>Code Share</h1>
+    <textarea id="code-editor"></textarea>
+</body>
+<link rel="stylesheet" href="public/codemirror/codemirror.css">
+<script src="public/codemirror/codemirror.js"></script>
+<script>
+    var codeEditorDiv = document.getElementById('code-editor');
+    var codeEditor = CodeMirror.fromTextArea(codeEditorDiv, {
+        lineNumbers: true
+    });
+</script>
+</html>
