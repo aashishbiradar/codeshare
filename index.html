@@ -10,11 +10,30 @@
     <textarea id="code-editor"></textarea>
 </body>
 <link rel="stylesheet" href="codemirror/codemirror.css">
+<script src="/socket.io/socket.io.js"></script>
 <script src="codemirror/codemirror.js"></script>
 <script>
+    var socket = io();
     var codeEditorDiv = document.getElementById('code-editor');
     var codeEditor = CodeMirror.fromTextArea(codeEditorDiv, {
-        lineNumbers: true
+        lineNumbers: true,
+        change: function (changeObj) {
+            console.log(changeObj)
+        }
+    });
+    var content = '';
+    codeEditor.on('change', function (cE, changeObj) {
+        var newContent = codeEditor.getValue();
+        if (newContent !== content) {
+            content = newContent;
+            socket.emit('codeChange', content);
+        }
+    });
+    socket.on('codeChange', function(newContent) {
+        if (newContent !== content) {
+            content = newContent;
+            codeEditor.setValue(content);
+        }
     });
 </script>
 </html>
