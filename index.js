@@ -6,14 +6,19 @@ const port = process.env.PORT || 3000;
 
 app.use(express.static('public'))
 
-app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/index.html');
-});
-
 io.on('connection', (socket) => {
-  socket.on('codeChange', (payload) => {
-    console.log('codeChange:\n' + payload);
-    socket.broadcast.emit('codeChange', payload);
+  socket.on('join', ({ shareId }) => {
+    socket.broadcast.to(shareId).emit('newUser', socket.id);
+    socket.join(shareId);
+    socket.on('codeChange', ({ socketId, shareId, payload }) => {
+      if (socketId) {
+        console.log(`socketId: ${socketId}, codeChange:\n${payload}`);
+        io.to(socketId).emit('codeChange', payload);
+      } else {
+        console.log(`shareId: ${shareId}, codeChange:\n${payload}`);
+        socket.broadcast.to(shareId).emit('codeChange', payload);
+      }
+    });
   });
 });
 
