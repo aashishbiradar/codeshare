@@ -1,10 +1,17 @@
 const express = require('express');
 const app = express();
+const cors = require('cors');
+app.use(cors());
+app.use(express.static('public'));
 const http = require('http').createServer(app);
-const io = require('socket.io')(http);
-const port = process.env.PORT || 3000;
+const io = require('socket.io')(http, {
+  cors: {
+    origin: "http://localhost:8080",
+    methods: ["GET", "POST"],
+  }
+});
 
-app.use(express.static('public'))
+const port = process.env.PORT || 3000;
 
 io.on('connection', (socket) => {
   socket.on('join', ({ shareId }) => {
@@ -12,10 +19,8 @@ io.on('connection', (socket) => {
     socket.join(shareId);
     socket.on('codeChange', ({ socketId, shareId, payload }) => {
       if (socketId) {
-        console.log(`socketId: ${socketId}, codeChange:\n${payload}`);
         io.to(socketId).emit('codeChange', payload);
       } else {
-        console.log(`shareId: ${shareId}, codeChange:\n${payload}`);
         socket.broadcast.to(shareId).emit('codeChange', payload);
       }
     });
